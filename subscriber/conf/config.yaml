@@ -1,0 +1,10 @@
+app:
+  name: 'sub'
+  worker: 40
+redis:
+  host : "redis:6379"
+  password : "LineThailand!"
+  retry : 5
+  poolsize: 400
+  minidieconns: 200
+  channelsize: 4196

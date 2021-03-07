@@ -1,0 +1,13 @@
+app:
+  name: 'pub'
+redis:
+  host : "redis:6379"
+  password : "LineThailand!"
+  retry : 5
+input:
+  path: "./input/input.csv"
+line:
+  report:
+     # not sure a valid token?, it return {"message":"user doesn't grant required permissions yet"}
+    token: "Bearer eyJhbGciOiJIUzI1NiJ9.C1GU4kPKzDzLS-D9lpPljTTyDaeG68XwGWFRDIKEtiJO_zJI4SzYaowXk_NEgnKnh1tzF2lSHvAcyGSBKGsWUCsKJu6SZYO5HO_ewf7y-n7JPrMFGeqgcrpdqwUK1Eta2dwPVV2N6EFEQvWSOSnLu0e4P19FSOEZLCPmvALVjo4.cH5f56c11-hoHRdWqk-y5GKAz8hFecQrx_cl62z3gIA"
+    endpoint: "https://backend-challenge.line-apps.com/healthcheck/report"

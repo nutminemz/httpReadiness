@@ -1,0 +1,21 @@
+FROM golang:1.15.2 AS builder
+
+RUN mkdir /app
+WORKDIR /app
+RUN go mod init subscriber
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build \
+-o subscriber .
+
+################################################
+FROM alpine:latest
+RUN apk add --no-cache tzdata && \
+    cp /usr/share/zoneinfo/Asia/Bangkok /etc/localtime && \
+    echo "Asia/Bangkok" >/etc/timezone && \
+    apk del tzdata
+COPY /conf/config.yaml /app/conf/config.yaml
+WORKDIR /app
+COPY --from=builder /app/subscriber .
+
+CMD ["/app/subscriber"]

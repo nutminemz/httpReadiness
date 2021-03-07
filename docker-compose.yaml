@@ -1,0 +1,64 @@
+version: "3.0"
+services:
+  redis:
+    image: "redis:alpine"
+    command: redis-server /usr/local/etc/redis/redis.conf
+    volumes:
+      - ./redis/data:/data
+      - ./redis/conf:/usr/local/etc/redis
+    networks:
+      - data_sharing
+    deploy:
+        resources:
+          limits:
+            cpus: '1'
+            memory: 80M
+  subscriber1:
+      environment:
+      - RDB=3
+      build:
+        context: ./subscriber
+        dockerfile: Dockerfile
+      depends_on: 
+        - redis
+      networks:
+        - data_sharing
+      deploy:
+        resources:
+          limits:
+            cpus: '1'
+            memory: 70M
+  subscriber2:
+      environment:
+      - RDB=5
+      build:
+        context: ./subscriber
+        dockerfile: Dockerfile
+      depends_on: 
+        - redis
+      networks:
+        - data_sharing
+      deploy:
+        resources:
+          limits:
+            cpus: '1'
+            memory: 70M
+  publisher:
+    environment:
+      - SLAVE1=3
+      - SLAVE2=5
+    build:
+      context: ./publisher
+      dockerfile: Dockerfile
+    depends_on: 
+      - redis
+    networks:
+      - data_sharing
+    deploy:
+        resources:
+          limits:
+            cpus: '1'
+            memory: 70M
+networks:
+  data_sharing:
+    driver: bridge
