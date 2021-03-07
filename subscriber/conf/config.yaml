@@ -1,6 +1,6 @@
 app:
-  name: 'sub'
-  worker: 40
+  name: 'sub-slave'
+  worker: 45
 redis:
   host : "redis:6379"
   password : "LineThailand!"

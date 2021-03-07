@@ -21,8 +21,8 @@ func FillProto(url string) (out string) {
 }
 
 // FetchHTTP :: get target URL return fail if timeout
-func FetchHTTP(msg *redis.Message) string {
-	url := FillProto(msg.Payload)
+func FetchHTTP(msg string) string {
+	url := FillProto(msg)
 	req, err := http.NewRequest("GET", url, nil)
 	resp, err := newNetClient().Do(req)
 	if err != nil {

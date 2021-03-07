@@ -1,5 +1,5 @@
 app:
-  name: 'pub'
+  name: 'pub-master'
 redis:
   host : "redis:6379"
   password : "LineThailand!"

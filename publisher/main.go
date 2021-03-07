@@ -7,62 +7,29 @@ import (
 	"log"
 	"os"
 	"runtime"
-	"strings"
 	"time"
 
 	"line/health/service"
 
-	"github.com/go-redis/redis/v8"
 	"github.com/spf13/viper"
 )
 
 func init() {
 	runtime.GOMAXPROCS(1)
-	// setup config
-	viper.AddConfigPath("./conf")
-
-	if err := viper.ReadInConfig(); err != nil {
-		log.Fatalf("Fatal error config file: %s", err)
-	}
-	viper.AutomaticEnv()
-	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
-	if err := viper.MergeConfig(strings.NewReader(viper.GetString("configs"))); err != nil {
-		log.Panic(err.Error())
-	} else {
-		log.Println("loaded config " + viper.GetString("app.name"))
-	}
-	log.Println(viper.AllSettings())
+	service.LoadConfig()
 }
 
 func main() {
-	log.Println("Waiting.. for redis")
-	// Uncomment 2 below line incase local run
+	// Uncomment 2 below line in case local run
 	//os.Setenv("SLAVE1", "3")
 	//os.Setenv("SLAVE2", "3")
 
-	// waiting for redis startup
-	time.Sleep(3 * time.Second)
-	// Create a new Redis Client
-	redisAddress := viper.GetString("redis.host")
-	redisPassword := viper.GetString("redis.password")
-	redisRetry := viper.GetInt("redis.retry")
-	redisClient := redis.NewClient(&redis.Options{
-		Addr:       redisAddress,
-		Password:   redisPassword,
-		MaxRetries: redisRetry,
-	})
-
-	// Ping the Redis server and check if any errors occured
-	err := redisClient.Ping(context.Background()).Err()
+	redisClient, err := service.ConnectRedis()
 	if err != nil {
-		// Sleep for 7 seconds and wait for Redis to initialize
-		log.Println("Waiting.. for redis")
-		time.Sleep(7 * time.Second)
-		err := redisClient.Ping(context.Background()).Err()
-		if err != nil {
-			panic(err)
-		}
+		log.Fatal(err)
 	}
+	log.Println("START PROCESS")
+
 	// Start time Rec
 	start := time.Now()
 
@@ -79,6 +46,8 @@ func main() {
 	// init result
 	redisClient.Set(ctx, "success", 0, 0)
 	redisClient.Set(ctx, "fail", 0, 0)
+
+	// line counter
 	i := 0
 	// Loop till end of file
 	for {
